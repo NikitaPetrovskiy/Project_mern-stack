@@ -1,6 +1,9 @@
 const { Router } = require('express');
 const bcrypt = require('bcryptjs');
 const { check, validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
+
+const config = require('config');
 const User = require('../models/User');
 
 const router = Router();
@@ -28,7 +31,7 @@ router.post(
 
             if(candidate) {
                 return res.status(400)
-                    .json('Пользователь с таким email уже существует!');
+                    .json({ massege: 'Пользователь с таким email уже существует!' });
             }
 
             const hashedPassword = await bcrypt.hash(password, 12);
@@ -38,18 +41,55 @@ router.post(
             res.status(201).json({ message: 'Пользователь создан' });
         } catch(e) {
             res.status(500)
-                .json('Что-то пошло не так! Попробуйте снова.');
+                .json({ massege: 'Что-то пошло не так! Попробуйте снова.' });
             console.log('Server Error: ', e.message);
         }
 });
 
 //api/auth/login
-router.post('/login', async (req, res) => {
-    try {
+router.post(
+    '/login',
+    [
+        check('email', 'Введите корректный email').normalizeEmail().isEmail(),
+        check('password', 'Введите пароль').exists()
+    ],
+    async (req, res) => {
+        try {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) {
+                return res.status(400).json({
+                    errors: errors.array(),
+                    massege: 'Некорректные данные при входе в систему.'
+                })
+            }
 
-    } catch(e) {
-        
-    }
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+
+        if(!user) {
+            return res.status(400)
+                .json({ massege: 'Пользователь не найден'});
+        }
+
+        const token = jwt(
+            { userId: user.id },
+            config.get('jwtSecret'),
+            { expiresIn: '1h' }
+        );
+
+        res.json({ token, userId: user.id })
+
+        const isMatch = bcrypt.compare(password, user.password);
+        if(!isMatch) {
+            return res.status(400).json({ massege: 'Неверный пароль, попробуйте снова' })
+        }
+
+
+        } catch(e) {
+            res.status(500)
+                .json({ massege: 'Что-то пошло не так! Попробуйте снова.' });
+            console.log('Server Error: ', e.message);
+        }
 });
 
 module.exports = router;
