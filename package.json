@@ -17,6 +17,7 @@
   "author": "NikitaPetrovskiy <nikpetrovskiy23@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "config": "^3.2.4",
     "express": "^4.17.1",
     "mongoose": "^5.8.7"
   },
