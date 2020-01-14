@@ -1,16 +1,27 @@
 import React, { useState } from 'react';
+
 import '../index.css';
+
+import { useHttp } from '../hooks/http.hook'
 
 export function AuthPage() {
     const [form, setForm] = useState({
         email: '', password: ''
     });
+    const { loading, request } = useHttp();
 
     const changeHandler = e => {
         setForm({
             ...form,
             [e.target.name]: e.target.value
         });
+    }
+
+    const registerHandler = async () => {
+        try {
+            const data = await request('/api/auth/register', 'POST', {...form});
+            console.log('Data: ', data);
+        } catch (e) {}
     }
 
     return (
@@ -54,10 +65,17 @@ export function AuthPage() {
                         </div>
                     </div>
                     <div className="card-action">
-                        <button className="btn yellow darken-3">
+                        <button 
+                            className="btn yellow darken-3"
+                            disabled={loading}
+                        >
                             Войти
                         </button>
-                        <button className="btn green darken-1">
+                        <button 
+                            className="btn green darken-1"
+                            onClick={registerHandler}
+                            disabled={loading}
+                        >
                             Регистрация
                         </button>
                     </div>
