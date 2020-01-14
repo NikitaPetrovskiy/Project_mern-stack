@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import '../index.css';
 
 import { useHttp } from '../hooks/http.hook'
 import { useMessage } from '../hooks/message.hook';
+import { AuthContext } from '../context/AuthContext';
 
 export function AuthPage() {
+    const auth = useContext(AuthContext);
     const [form, setForm] = useState({
         email: '', password: ''
     });
@@ -31,9 +33,16 @@ export function AuthPage() {
         } catch (e) {}
     }
 
+    const loginHandler = async () => {
+        try {
+            const data = await request('/api/auth/login', 'POST', {...form});
+            auth.login(data.token, data.userId)
+        } catch (e) {}
+    }
+
     return (
         <div className="row">
-            <div className="col s6 offset-s4">
+            <div className="col s6 offset-s3">
                 <h1>Сократи ссылку</h1>
                 <div className="card blue darken-1">
                     <div className="card-content white-text">
@@ -74,6 +83,7 @@ export function AuthPage() {
                     <div className="card-action">
                         <button 
                             className="btn yellow darken-3"
+                            onClick={loginHandler}
                             disabled={loading}
                         >
                             Войти

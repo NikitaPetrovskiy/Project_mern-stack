@@ -71,20 +71,17 @@ router.post(
                 .json({ message: 'Пользователь не найден'});
         }
 
-        const token = jwt(
-            { userId: user.id },
-            config.get('jwtSecret'),
-            { expiresIn: '1h' }
-        );
-
-        res.json({ token, userId: user.id })
-
-        const isMatch = bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch) {
             return res.status(400).json({ message: 'Неверный пароль, попробуйте снова' })
         }
 
-
+        const token = jwt.sign(
+            { userId: user.id },
+            config.get('jwtSecret'),
+            { expiresIn: '1h' }
+        );
+        res.json({ token, userId: user.id })
         } catch(e) {
             res.status(500)
                 .json({ message: 'Что-то пошло не так! Попробуйте снова.' });
