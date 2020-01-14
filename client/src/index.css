@@ -1,5 +1,9 @@
 @import "~materialize-css/dist/css/materialize.min.css";
 
+.navbar {
+    padding: 0 2rem;
+}
+
 .btn {
     margin-right: 15px;
 }
