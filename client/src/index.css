@@ -19,3 +19,6 @@ input.yellow-input:focus {
 input.yellow-input:focus + label {
     color: #ffeb3b !important;
 }
+.toast {
+    background: #c62828;
+}

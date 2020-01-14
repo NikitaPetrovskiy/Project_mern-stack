@@ -22,7 +22,7 @@ router.post(
             if(!errors.isEmpty()) {
                 return res.status(400).json({
                     errors: errors.array(),
-                    massege: 'Некорректные данные при регистрации'
+                    message: 'Некорректные данные при регистрации'
                 })
             }
 
@@ -31,7 +31,7 @@ router.post(
 
             if(candidate) {
                 return res.status(400)
-                    .json({ massege: 'Пользователь с таким email уже существует!' });
+                    .json({ message: 'Пользователь с таким email уже существует!' });
             }
 
             const hashedPassword = await bcrypt.hash(password, 12);
@@ -41,7 +41,7 @@ router.post(
             res.status(201).json({ message: 'Пользователь создан' });
         } catch(e) {
             res.status(500)
-                .json({ massege: 'Что-то пошло не так! Попробуйте снова.' });
+                .json({ message: 'Что-то пошло не так! Попробуйте снова.' });
             console.log('Server Error: ', e.message);
         }
 });
@@ -59,7 +59,7 @@ router.post(
             if(!errors.isEmpty()) {
                 return res.status(400).json({
                     errors: errors.array(),
-                    massege: 'Некорректные данные при входе в систему.'
+                    message: 'Некорректные данные при входе в систему.'
                 })
             }
 
@@ -68,7 +68,7 @@ router.post(
 
         if(!user) {
             return res.status(400)
-                .json({ massege: 'Пользователь не найден'});
+                .json({ message: 'Пользователь не найден'});
         }
 
         const token = jwt(
@@ -81,13 +81,13 @@ router.post(
 
         const isMatch = bcrypt.compare(password, user.password);
         if(!isMatch) {
-            return res.status(400).json({ massege: 'Неверный пароль, попробуйте снова' })
+            return res.status(400).json({ message: 'Неверный пароль, попробуйте снова' })
         }
 
 
         } catch(e) {
             res.status(500)
-                .json({ massege: 'Что-то пошло не так! Попробуйте снова.' });
+                .json({ message: 'Что-то пошло не так! Попробуйте снова.' });
             console.log('Server Error: ', e.message);
         }
 });
